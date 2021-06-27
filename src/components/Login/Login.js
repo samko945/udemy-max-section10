@@ -7,24 +7,13 @@ import Button from "../UI/Button/Button";
 const Login = (props) => {
 	const formReducer = (state, action) => {
 		if (action.type === "email_input") {
-			return { ...state, enteredEmail: action.value, formIsValid: state.emailIsValid && state.passwordIsValid };
+			return { ...state, enteredEmail: action.value, emailIsValid: action.value.includes("@") };
 		}
 		if (action.type === "password_input") {
-			return { ...state, enteredPassword: action.value, formIsValid: state.emailIsValid && state.passwordIsValid };
+			return { ...state, enteredPassword: action.value, passwordIsValid: action.value.length > 6 };
 		}
-		if (action.type === "validate_email") {
-			if (state.enteredEmail.length) {
-				return { ...state, emailIsValid: state.enteredEmail.includes("@"), formIsValid: state.enteredEmail.includes("@") && state.passwordIsValid };
-			} else {
-				return state;
-			}
-		}
-		if (action.type === "validate_password") {
-			if (state.enteredPassword.length) {
-				return { ...state, passwordIsValid: state.enteredPassword.length > 6, formIsValid: state.emailIsValid && state.enteredPassword.length > 6 };
-			} else {
-				return state;
-			}
+		if (action.type === "validate_form") {
+			return { ...state, formIsValid: state.emailIsValid && state.passwordIsValid };
 		}
 	};
 
@@ -38,13 +27,13 @@ const Login = (props) => {
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
-			dispatchForm({ type: "validate_email" });
-			dispatchForm({ type: "validate_password" });
-		}, 500);
+			dispatchForm({ type: "validate_form" });
+			console.log("check form valid");
+		}, 0);
 		return () => {
 			clearTimeout(timeout);
 		};
-	}, [form.enteredEmail, form.enteredPassword]);
+	}, [form.emailIsValid, form.passwordIsValid]);
 
 	const emailChangeHandler = (event) => {
 		dispatchForm({ type: "email_input", value: event.target.value });
